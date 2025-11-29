@@ -237,21 +237,21 @@ if __name__ == "__main__":
     parser.add_argument(
         "--projection_steps",
         type=int,
-        default=10,
+        default=1,
         dest="projection_steps",
         help="projection steps",
     )
     parser.add_argument(
         "--semantic_steps",
         type=int,
-        default=1000,
+        default=10,
         dest="semantic_steps",
         help="semantic search steps",
     )
     parser.add_argument(
         "--pattern_steps",
         type=int,
-        default=1500,
+        default=15,
         dest="pattern_steps",
         help="pattern search steps",
     )
