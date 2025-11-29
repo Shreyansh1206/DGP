@@ -69,26 +69,6 @@ def _run_cmd(cmd):
         )
 
 
-def _prepare_nvcc_cli(opts):
-    # cmd = 'nvcc ' + opts.strip()
-    cmd = "nvcc --std=c++17 -DNDEBUG " + opts.strip()
-    cmd += " --disable-warnings"
-    cmd += ' --include-path "%s"' % tf.sysconfig.get_include()
-    cmd += ' --include-path "%s"' % os.path.join(
-        tf.sysconfig.get_include(), "external", "protobuf_archive", "src"
-    )
-    cmd += ' --include-path "%s"' % os.path.join(
-        tf.sysconfig.get_include(), "external", "com_google_absl"
-    )
-    cmd += ' --include-path "%s"' % os.path.join(
-        tf.sysconfig.get_include(), "external", "eigen_archive"
-    )
-
-    compiler_bindir = _find_compiler_bindir()
-    if compiler_bindir is None:
-        # Require that _find_compiler_bindir succeeds on Windows.  Allow
-        # nvcc to use whatever is the default on Linux.
-        if os.name == "nt":
             raise RuntimeError(
                 'Could not find MSVC/GCC/CLANG installation on this computer. Check compiler_bindir_search_path list in "%s".'
                 % __file__
@@ -159,10 +139,9 @@ def get_plugin(cuda_file):
                 tf.sysconfig.get_lib(), "python", "_pywrap_tensorflow_internal.lib"
             )
         elif os.name == "posix":
-            compile_opts += '"%s"' % os.path.join(
-                tf.sysconfig.get_lib(), "python", "_pywrap_tensorflow_internal.so"
-            )
-            compile_opts += " --compiler-options '-fPIC -D_GLIBCXX_USE_CXX11_ABI=0'"
+            for flag in tf.sysconfig.get_link_flags():
+                compile_opts += " " + flag
+            compile_opts += " --compiler-options '-fPIC'"
         else:
             assert False  # not Windows or Linux, w00t?
         compile_opts += " --gpu-architecture=%s" % _get_cuda_gpu_arch_string()
