@@ -76,6 +76,30 @@ def _run_cmd(cmd):
     else:
         cmd += ' --compiler-bindir "%s"' % compiler_bindir
     cmd += " 2>&1"
+    cmd += " 2>&1"
+    return cmd
+
+
+def _prepare_nvcc_cli(opts):
+    # cmd = 'nvcc ' + opts.strip()
+    cmd = "nvcc --std=c++17 -DNDEBUG " + opts.strip()
+    cmd += " --disable-warnings"
+    for flag in tf.sysconfig.get_compile_flags():
+        if flag.startswith("-I") or flag.startswith("-D"):
+            cmd += " " + flag
+
+    compiler_bindir = _find_compiler_bindir()
+    if compiler_bindir is None:
+        # Require that _find_compiler_bindir succeeds on Windows.  Allow
+        # nvcc to use whatever is the default on Linux.
+        if os.name == "nt":
+            raise RuntimeError(
+                'Could not find MSVC/GCC/CLANG installation on this computer. Check compiler_bindir_search_path list in "%s".'
+                % __file__
+            )
+    else:
+        cmd += ' --compiler-bindir "%s"' % compiler_bindir
+    cmd += " 2>&1"
     return cmd
 
 
