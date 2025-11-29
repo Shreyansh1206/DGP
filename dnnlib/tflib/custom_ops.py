@@ -68,15 +68,6 @@ def _run_cmd(cmd):
             % (cmd, output)
         )
 
-        if os.name == "nt":
-            raise RuntimeError(
-                'Could not find MSVC/GCC/CLANG installation on this computer. Check compiler_bindir_search_path list in "%s".'
-                % __file__
-            )
-    else:
-        cmd += ' --compiler-bindir "%s"' % compiler_bindir
-    cmd += " 2>&1"
-    cmd += " 2>&1"
     return cmd
 
 
