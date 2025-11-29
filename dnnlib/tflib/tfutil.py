@@ -188,26 +188,24 @@ def init_uninitialized_vars(target_vars: List[tf.Variable] = None) -> None:
     if target_vars is None:
         target_vars = tf.global_variables()
 
-    test_vars = []
-    test_ops = []
+    # Get list of uninitialized variable names
+    uninitialized_var_names = run(tf.report_uninitialized_variables())
+    # Handle byte strings if necessary and create a set for fast lookup
+    uninitialized_var_names = set(
+        n.decode("utf-8") if isinstance(n, bytes) else n
+        for n in uninitialized_var_names
+    )
 
-    with tf.control_dependencies(None):  # ignore surrounding control_dependencies
-        for var in target_vars:
-            assert is_tf_expression(var)
+    # Filter target_vars
+    vars_to_init = []
+    for var in target_vars:
+        assert is_tf_expression(var)
+        # Variable names in report_uninitialized_variables do not have the :0 suffix
+        if var.name.split(":")[0] in uninitialized_var_names:
+            vars_to_init.append(var)
 
-            try:
-                tf.get_default_graph().get_tensor_by_name(
-                    var.name.replace(":0", "/IsVariableInitialized:0")
-                )
-            except KeyError:
-                # Op does not exist => variable may be uninitialized.
-                test_vars.append(var)
-
-                with absolute_name_scope(var.name.split(":")[0]):
-                    test_ops.append(tf.is_variable_initialized(var))
-
-    init_vars = [var for var, inited in zip(test_vars, run(test_ops)) if not inited]
-    run([var.initializer for var in init_vars])
+    if vars_to_init:
+        run(tf.variables_initializer(vars_to_init))
 
 
 def set_vars(var_to_value_dict: dict) -> None:
