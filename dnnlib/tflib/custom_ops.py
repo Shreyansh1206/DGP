@@ -71,7 +71,7 @@ def _run_cmd(cmd):
 
 def _prepare_nvcc_cli(opts):
     # cmd = 'nvcc ' + opts.strip()
-    cmd = "nvcc --std=c++14 -DNDEBUG " + opts.strip()
+    cmd = "nvcc --std=c++17 -DNDEBUG " + opts.strip()
     cmd += " --disable-warnings"
     cmd += ' --include-path "%s"' % tf.sysconfig.get_include()
     cmd += ' --include-path "%s"' % os.path.join(
