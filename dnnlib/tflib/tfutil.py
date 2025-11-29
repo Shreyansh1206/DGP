@@ -36,7 +36,9 @@ def run(*args, **kwargs) -> Any:
 
 def is_tf_expression(x: Any) -> bool:
     """Check whether the input is a valid Tensorflow expression, i.e., Tensorflow Tensor, Variable, or Operation."""
-    return isinstance(x, (tf.Tensor, tf.Variable, tf.Operation))
+    return isinstance(x, (tf.Tensor, tf.Variable, tf.Operation)) or (
+        hasattr(x, "name") and hasattr(x, "graph")
+    )
 
 
 def shape_to_list(shape: Iterable[tf.Dimension]) -> List[Union[int, None]]:
