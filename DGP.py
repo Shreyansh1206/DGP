@@ -55,7 +55,8 @@ def projection(args, sess, cloth_dir, parse_residual_np, step=300):
             args.w_train_op, {args.x: args.x_np, args.parse_residual: parse_residual_np}
         )
         outputs_projection = sess.run([args.wp, args.x_rec])
-        projection_list.append(outputs_projection.copy())
+        if step % 100 == 0 or step == step:
+            projection_list.append(outputs_projection.copy())
 
     # plt.imshow(outputs_projection[1][0].transpose([1,2,0])/2+0.5)
     # plt.show()
@@ -81,7 +82,8 @@ def semantic_search(
     for step in tqdm(range(1, step + 1), leave=False):
         sess.run(mask_train_op_w, {args.x: args.x_np})
         outputs_semantic_search = sess.run([args.wp, args.x_rec])
-        semantic_search_list.append(outputs_semantic_search.copy())
+        if step % 100 == 0 or step == step:
+            semantic_search_list.append(outputs_semantic_search.copy())
 
     # plt.imshow(outputs_semantic_search[1][0].transpose([1,2,0])/2+0.5)
     # plt.show()
@@ -111,7 +113,8 @@ def pattern_search(
     for step in tqdm(range(1, step + 1), leave=False):
         sess.run(mask_train_op_n, {args.x: args.x_np})
         outputs_pattern_search = sess.run([args.wp, args.x_rec])
-        pattern_search_list.append(outputs_pattern_search.copy())
+        if step % 100 == 0 or step == step:
+            pattern_search_list.append(outputs_pattern_search.copy())
 
     # plt.imshow(outputs_pattern_search[1][0].transpose([1,2,0])/2+0.5)
     # plt.show()
