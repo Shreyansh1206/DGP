@@ -355,7 +355,17 @@ class Network:
         module = types.ModuleType(module_name)
         sys.modules[module_name] = module
         _import_module_src[module] = self._build_module_src
-        exec(self._build_module_src, module.__dict__)  # pylint: disable=exec-used
+
+        # Patch source code to use tensorflow.compat.v1
+        patched_src = self._build_module_src
+        patched_src = patched_src.replace(
+            "import tensorflow as tf", "import tensorflow.compat.v1 as tf"
+        )
+        patched_src = patched_src.replace(
+            "import tensorflow\n", "import tensorflow.compat.v1 as tensorflow\n"
+        )
+
+        exec(patched_src, module.__dict__)  # pylint: disable=exec-used
 
         # Locate network build function in the temporary module.
         self._build_func = util.get_obj_from_module(module, self._build_func_name)
